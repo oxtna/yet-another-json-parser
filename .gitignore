@@ -1,0 +1,9 @@
+# CMake build directory
+build/
+build*/
+
+# VS Code
+.vscode/
+
+# clangd
+.cache
