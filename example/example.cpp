@@ -1,8 +1,13 @@
 #include "token.h"
+#include "tokenizer.h"
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <utility>
+#include <algorithm>
+
+using namespace yajp;
 
 void print_help(const char* program_name)
 {
@@ -34,9 +39,16 @@ int main(int argc, const char** argv)
         return -1;
     }
 
-    yajp::Token token(content.c_str());
+    Tokenizer tokenizer(std::move(content));
+    auto tokens = tokenizer.all();
 
-    std::cout << token.value << std::endl;
+    for (const auto& token : tokens)
+    {
+        std::cout << token.to_string() << '\n';
+    }
+    std::cout << std::endl;
 
-    return 0;
+    return !std::any_of(tokens.begin(), tokens.end(), [](const Token& token) {
+        return token.type() == Token::Type::Invalid;
+    });
 }
