@@ -1,5 +1,5 @@
 set(test_sources
-  test_hello_world.cpp
+  test_tokenizer.cpp
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
