@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <array>
+#include <cstddef>
 
 namespace yajp
 {
@@ -8,6 +9,8 @@ namespace yajp
 class Token
 {
   public:
+    static constexpr std::size_t TypeCount = 13;
+
     enum class Type
     {
         Invalid = 0,
@@ -40,7 +43,7 @@ class Token
     Type _type;
     std::string _value;
 
-    static constexpr std::array<const char*, 13> _type_str = {
+    static constexpr std::array<const char*, TypeCount> _type_str = {
         "Invalid",
         "KeywordTrue",
         "KeywordFalse",

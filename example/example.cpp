@@ -1,17 +1,82 @@
-#include "token.h"
-#include "tokenizer.h"
+#include "value.h"
+#include "parser.h"
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
+#include <map>
+#include <vector>
+#include <stdexcept>
 #include <utility>
-#include <algorithm>
 
 using namespace yajp;
 
 void print_help(const char* program_name)
 {
     std::cout << "Usage: " << program_name << " FILE" << std::endl;
+}
+
+std::string value_to_string(const Value& value, const std::string& separator = "\n")
+{
+    std::ostringstream oss;
+    switch (value.type())
+    {
+    case Value::Type::Null:
+        oss << "null";
+        break;
+    case Value::Type::Number:
+        oss << value.get<Value::Type::Number>();
+        break;
+    case Value::Type::String:
+        oss << value.get<Value::Type::String>();
+        break;
+    case Value::Type::Bool:
+        oss << std::boolalpha << value.get<Value::Type::Bool>()
+            << std::resetiosflags(std::cout.boolalpha);
+        break;
+    case Value::Type::Object:
+        for (const auto& [k, v] : value.get<Value::Type::Object>())
+        {
+            oss << "Key=" << k << ", Value=";
+            if (v.type() == Value::Type::Array)
+            {
+                oss << "Array(" << &v << ')';
+            }
+            else if (v.type() == Value::Type::Object)
+            {
+                oss << "Object(" << &v << ')';
+            }
+            else
+            {
+                oss << value_to_string(v);
+            }
+            oss << separator;
+        }
+        break;
+    case Value::Type::Array:
+        for (const auto& v : value.get<Value::Type::Array>())
+        {
+            oss << "Value=";
+            if (v.type() == Value::Type::Array)
+            {
+                oss << "Array(" << &v << ')';
+            }
+            else if (v.type() == Value::Type::Object)
+            {
+                oss << "Object(" << &v << ')';
+            }
+            else
+            {
+                oss << value_to_string(v);
+            }
+            oss << separator;
+        }
+        break;
+    default:
+        throw std::logic_error("Invalid Value Type");
+    }
+    return oss.str();
 }
 
 int main(int argc, const char** argv)
@@ -39,16 +104,18 @@ int main(int argc, const char** argv)
         return -1;
     }
 
-    Tokenizer tokenizer(std::move(content));
-    auto tokens = tokenizer.all();
-
-    for (const auto& token : tokens)
+    Parser parser;
+    Value json = parser.parse(std::move(content));
+    try
     {
-        std::cout << token.to_string() << '\n';
+        std::cout << value_to_string(json);
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return -1;
+    }
 
-    return !std::any_of(tokens.begin(), tokens.end(), [](const Token& token) {
-        return token.type() == Token::Type::Invalid;
-    });
+    return 0;
 }
