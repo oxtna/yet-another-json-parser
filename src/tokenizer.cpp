@@ -77,6 +77,10 @@ std::vector<Token> Tokenizer::all()
             break;
         }
     }
+    if (tokens.back().type() != Token::Type::Invalid && tokens.back().type() != Token::Type::End)
+    {
+        tokens.emplace_back(Token::Type::End, std::string());
+    }
     return tokens;
 }
 
