@@ -171,7 +171,7 @@ void Parser::consume(const Token& token)
             }
             break;
         case Token::Type::String:
-            _key_stack.push(token.value());
+            _key_stack.push(strip_string_quotes(token.value()));
             next_state = State::ObjectKey;
             break;
         default:
@@ -257,6 +257,18 @@ void Parser::consume(const Token& token)
             {
                 next_state = State::ObjectValue;
             }
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case State::ObjectComma: {
+        switch (token.type())
+        {
+        case Token::Type::String:
+            _key_stack.push(strip_string_quotes(token.value()));
+            next_state = State::ObjectKey;
             break;
         default:
             break;
@@ -405,7 +417,7 @@ void Parser::consume(const Token& token)
 
 std::string Parser::strip_string_quotes(const std::string& string) const
 {
-    return string.substr(1, string.size() - 1);
+    return string.substr(1, string.size() - 2);
 }
 
 }
