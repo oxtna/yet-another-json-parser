@@ -235,5 +235,34 @@ int main()
         std::cerr << "Failed test case 3.\n";
     }
 
+    test_data = R"(["\"", "\n", "\t", "\r", "\\"])";
+    test_target = {
+        Token(Token::Type::LeftBracket, "["),
+        Token(Token::Type::String, "\"\\\"\""),
+        Token(Token::Type::Comma, ","),
+        Token(Token::Type::String, "\"\\n\""),
+        Token(Token::Type::Comma, ","),
+        Token(Token::Type::String, "\"\\t\""),
+        Token(Token::Type::Comma, ","),
+        Token(Token::Type::String, "\"\\r\""),
+        Token(Token::Type::Comma, ","),
+        Token(Token::Type::String, "\"\\\\\""),
+        Token(Token::Type::RightBracket, "]"),
+        Token(Token::Type::End, {}),
+    };
+    if (!test(std::move(test_data), test_target))
+    {
+        failed_any = true;
+        std::cerr << "Failed test case 4.\n";
+    }
+
+    test_data = "";
+    test_target = {Token(Token::Type::End, {})};
+    if (!test(std::move(test_data), test_target))
+    {
+        failed_any = true;
+        std::cerr << "Failed test case 5.\n";
+    }
+
     return failed_any ? -1 : 0;
 }

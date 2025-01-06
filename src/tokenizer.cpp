@@ -69,6 +69,10 @@ Token Tokenizer::next()
 std::vector<Token> Tokenizer::all()
 {
     std::vector<Token> tokens;
+    if (_input.empty())
+    {
+        tokens.emplace_back(Token::Type::End, std::string());
+    }
     while (_position != _input.end())
     {
         tokens.emplace_back(next());
